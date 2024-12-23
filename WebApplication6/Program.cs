@@ -1,28 +1,7 @@
 using System.Text.Json.Serialization;
 using ServiceSelf;
 
-const string serviceName = "socketServer";
-var serviceOptions = new ServiceOptions
-{
-    Description = "基于kestrel的socket+websocket服务器",
-};
-
-var workingDirectory = Environment.CurrentDirectory;
-var execStart = string.Join("/", workingDirectory, "WebApplicationTarget");
-
-Console.WriteLine($"execStart: {execStart}");
-        
-serviceOptions.Linux.Service["WorkingDirectory"] = workingDirectory;
-// serviceOptions.Linux.Service["ExecStart"] = execStart;
-// serviceOptions.Linux.Service["Environment"] = "ASPNETCORE_ENVIRONMENT=Production";
-// serviceOptions.Linux.Service["User"] = "root";
-// serviceOptions.Linux.Service["LimitMEMORY"] = "5120M";
-// serviceOptions.Linux.Service["LimitNOFILE"] = "50000";
-// serviceOptions.Linux.Service["LimitCPU"] = "100%";
-serviceOptions.Linux.Service.Restart = "always";
-serviceOptions.Linux.Service.RestartSec = "10";
-
-if (!Service.UseServiceSelf(args, serviceName, serviceOptions))
+if (!Service.UseServiceSelf(args))
     return;
 
 var builder = WebApplication.CreateSlimBuilder(args);
@@ -60,3 +39,30 @@ public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplet
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
 }
+
+//
+// const string serviceName = "socketServer";
+// var serviceOptions = new ServiceOptions
+// {
+//     Arguments = new[] { new Argument("key", "value") },
+//     Description = "-这是演示示例应用-",
+// };
+// serviceOptions.Linux.Service.Restart = "always";
+// serviceOptions.Linux.Service.RestartSec = "10";
+// serviceOptions.Windows.DisplayName = "-演示示例-";
+// serviceOptions.Windows.FailureActionType = WindowsServiceActionType.Restart;
+//
+// var workingDirectory = Environment.CurrentDirectory;
+// var execStart = string.Join("/", workingDirectory, "WebApplicationTarget");
+//
+// Console.WriteLine($"execStart: {execStart}");
+//         
+// serviceOptions.Linux.Service["WorkingDirectory"] = workingDirectory;
+// // serviceOptions.Linux.Service["ExecStart"] = execStart;
+// // serviceOptions.Linux.Service["Environment"] = "ASPNETCORE_ENVIRONMENT=Production";
+// // serviceOptions.Linux.Service["User"] = "root";
+// // serviceOptions.Linux.Service["LimitMEMORY"] = "5120M";
+// // serviceOptions.Linux.Service["LimitNOFILE"] = "50000";
+// // serviceOptions.Linux.Service["LimitCPU"] = "100%";
+// serviceOptions.Linux.Service.Restart = "always";
+// serviceOptions.Linux.Service.RestartSec = "10";

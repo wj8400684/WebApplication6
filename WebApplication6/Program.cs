@@ -1,6 +1,33 @@
 using System.Text.Json.Serialization;
+using ServiceSelf;
+
+const string serviceName = "socketServer";
+var serviceOptions = new ServiceOptions
+{
+    Description = "基于kestrel的socket+websocket服务器",
+};
+
+var workingDirectory = Environment.CurrentDirectory;
+var execStart = string.Join("/", workingDirectory, "WebApplicationTarget");
+
+Console.WriteLine($"execStart: {execStart}");
+        
+serviceOptions.Linux.Service["WorkingDirectory"] = workingDirectory;
+// serviceOptions.Linux.Service["ExecStart"] = execStart;
+// serviceOptions.Linux.Service["Environment"] = "ASPNETCORE_ENVIRONMENT=Production";
+// serviceOptions.Linux.Service["User"] = "root";
+// serviceOptions.Linux.Service["LimitMEMORY"] = "5120M";
+// serviceOptions.Linux.Service["LimitNOFILE"] = "50000";
+// serviceOptions.Linux.Service["LimitCPU"] = "100%";
+serviceOptions.Linux.Service.Restart = "always";
+serviceOptions.Linux.Service.RestartSec = "10";
+
+if (!Service.UseServiceSelf(args, serviceName, serviceOptions))
+    return;
 
 var builder = WebApplication.CreateSlimBuilder(args);
+
+builder.Host.UseServiceSelf();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -9,7 +36,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 var app = builder.Build();
 
-var sampleTodos = new Todo[] {
+var sampleTodos = new Todo[]
+{
     new(1, "Walk the dog"),
     new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
     new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
@@ -31,5 +59,4 @@ public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplet
 [JsonSerializable(typeof(Todo[]))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
-
 }
